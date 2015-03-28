@@ -2,6 +2,7 @@
 #include "hott/sumd.h"
 #include "sumd_input.h"
 
+event_source_t rc_in_event;
 static struct rc_input_s in = {.no_signal = true};
 
 void sumd_input_get(struct rc_input_s *rc_in)
@@ -34,6 +35,7 @@ static THD_FUNCTION(sumd_input_task, arg)
                 in.channel[i] = ((float)rc.channel[i] - SUMD_POS_NEUTRAL) / (SUMD_POS_HIGH - SUMD_POS_NEUTRAL);
             }
             chSysUnlock();
+            chEvtBroadcastFlags(&rc_in_event, RC_INPUT_EVENT);
             if (in.no_signal) {
                 status_led_off();
             } else {
@@ -46,5 +48,6 @@ static THD_FUNCTION(sumd_input_task, arg)
 
 void sumd_input_start(BaseSequentialStream *input)
 {
+    chEvtObjectInit(&rc_in_event);
     chThdCreateStatic(sumd_input_task_wa, sizeof(sumd_input_task_wa), LOWPRIO, sumd_input_task, input);
 }

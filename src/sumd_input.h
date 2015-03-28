@@ -11,6 +11,9 @@ struct rc_input_s {
     float channel[RC_INPUT_MAX_NB_CHANNELS];
 };
 
+#define RC_INPUT_EVENT 1
+extern event_source_t rc_in_event;
+
 void sumd_input_start(BaseSequentialStream *input);
 void sumd_input_get(struct rc_input_s *rc_in);
 
