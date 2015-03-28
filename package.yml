@@ -19,6 +19,7 @@ target.arm:
     - src/parameter_print.c
     - src/sdlog.c
     - src/stream.c
+    - src/analog.c
 
 depends:
     - crc
