@@ -42,6 +42,10 @@ static THD_FUNCTION(adc_task, arg)
 {
     (void)arg;
     chRegSetThreadName("adc read");
+
+    // uart conn 3 rx pin (PA3)
+    palSetPadMode(GPIOA, GPIOA_UART2_RX_CONN3, PAL_MODE_INPUT_ANALOG);
+
     static adcsample_t adc_samples[ADC_NB_CHANNELS * DMA_BUFFER_SIZE];
     static const ADCConversionGroup adcgrpcfg1 = {
         TRUE,                   // circular
