@@ -6,6 +6,7 @@
 #include "main.h"
 #include "sensors/onboardsensors.h"
 #include "sumd_input.h"
+#include "analog.h"
 #include "git_revision.h"
 
 #include "sdlog.h"
@@ -115,8 +116,17 @@ static THD_FUNCTION(sdlog, arg)
     const char *ms5611_descr = "time,static_pressure,air_temp\n";
     error |= error || f_write(&ms5611_fd, ms5611_descr, strlen(ms5611_descr), &_bytes_written);
 
+    static FIL analog_fd;
+    res = f_open(&analog_fd, "/log/analog.csv", FA_WRITE | FA_CREATE_ALWAYS);
+    if (res) {
+        chprintf(stdout, "error %d opening %s\n", res, "/log/analog.csv");
+        return -1;
+    }
+    const char *analog_descr = "time,pitot_pressure\n";
+    error |= error || f_write(&analog_fd, analog_descr, strlen(analog_descr), &_bytes_written);
+
     while (!error) {
-        eventmask_t events = chEvtWaitAny(EVENT_MASK_MPU6000 | EVENT_MASK_HMC5883L | EVENT_MASK_H3LIS331DL | EVENT_MASK_MS5611);
+        eventmask_t events = chEvtWaitAny(EVENT_MASK_MPU6000 | EVENT_MASK_HMC5883L | EVENT_MASK_H3LIS331DL | EVENT_MASK_MS5611 | EVENT_MASK_RC_IN);
         float t = (float)chVTGetSystemTimeX() / CH_CFG_ST_FREQUENCY;
 
         if (events & EVENT_MASK_MPU6000) {
@@ -190,11 +200,11 @@ static THD_FUNCTION(sdlog, arg)
             msObjectInit(&writebuf_stream, writebuf, sizeof(writebuf), 0);
             chprintf((BaseSequentialStream*)&writebuf_stream, "%f,%f,%f\n", t, baro, temp);
             UINT _bytes_written;
-            int ret = f_write(&h3lis331dl_fd, writebuf, writebuf_stream.eos, &_bytes_written);
+            int ret = f_write(&ms5611_fd, writebuf, writebuf_stream.eos, &_bytes_written);
             static int sync_needed = 0;
             sync_needed++;
             if (sync_needed == 100) {
-                f_sync(&h3lis331dl_fd);
+                f_sync(&ms5611_fd);
                 sync_needed = 0;
             }
         }
@@ -214,6 +224,21 @@ static THD_FUNCTION(sdlog, arg)
             sync_needed++;
             if (sync_needed == 100) {
                 f_sync(&rc_fd);
+                sync_needed = 0;
+            }
+        }
+
+        if (events & EVENT_MASK_MPU6000) { // todo
+            int32_t adc = analog_get();
+            float press = (float)(adc - (1<<15))/(1<<15) * 6000; // [Pa] fs: +- 60mbar
+            msObjectInit(&writebuf_stream, writebuf, sizeof(writebuf), 0);
+            chprintf((BaseSequentialStream*)&writebuf_stream, "%f,%f\n", t, press);
+            UINT _bytes_written;
+            int ret = f_write(&analog_fd, writebuf, writebuf_stream.eos, &_bytes_written);
+            static int sync_needed = 0;
+            sync_needed++;
+            if (sync_needed == 100) {
+                f_sync(&analog_fd);
                 sync_needed = 0;
             }
         }

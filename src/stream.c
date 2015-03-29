@@ -3,6 +3,7 @@
 #include <chprintf.h>
 #include <string.h>
 #include "sensors/onboardsensors.h"
+#include "analog.h"
 #include "cmp_mem_access/cmp_mem_access.h"
 #include "serial-datagram/serial_datagram.h"
 
@@ -136,6 +137,22 @@ static THD_FUNCTION(stream, arg)
             const char *temp_id = "air_temp";
             err = err || !cmp_write_str(&cmp, temp_id, strlen(temp_id));
             err = err || !cmp_write_float(&cmp, temp);
+            const char *time_id = "time";
+            err = err || !cmp_write_str(&cmp, time_id, strlen(time_id));
+            err = err || !cmp_write_float(&cmp, t);
+            if (!err) {
+                serial_datagram_send(dtgrm, cmp_mem_access_get_pos(&mem), _stream_imu_values_sndfn, out);
+            }
+        }
+        if (events & EVENT_MASK_MPU6000) { // todo
+            int32_t adc = analog_get();
+            float press = (float)(adc - (1<<15))/(1<<15) * 6000; // [Pa] fs: +- 60mbar
+            cmp_mem_access_init(&cmp, &mem, dtgrm, sizeof(dtgrm));
+            bool err = false;
+            err = err || !cmp_write_map(&cmp, 2);
+            const char *press_id = "pitot_press";
+            err = err || !cmp_write_str(&cmp, press_id, strlen(press_id));
+            err = err || !cmp_write_float(&cmp, press);
             const char *time_id = "time";
             err = err || !cmp_write_str(&cmp, time_id, strlen(time_id));
             err = err || !cmp_write_float(&cmp, t);

@@ -179,8 +179,14 @@ int main(void)
     sumd_input_start((BaseSequentialStream*)&UART_CONN2);
 
     sdlog_start();
-    stream_start((BaseSequentialStream*)&UART_CONN4);
+    // stream_start((BaseSequentialStream*)&UART_CONN4);
 
+    if (palReadPad(GPIOC, GPIOC_SDCARD_DETECT)) { // no card
+        stream_start((BaseSequentialStream*)&SDU1);
+        while (1) {
+            chThdSleepMilliseconds(100);
+        }
+    }
     // while (1) {
     //     chThdSleepMilliseconds(100);
     //     sdcard_automount();

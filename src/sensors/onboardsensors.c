@@ -243,7 +243,7 @@ static THD_FUNCTION(i2c_sensors, arg)
 
     h3lis331dl_acc_sample.sensor = NULL; // todo
     i2cAcquireBus(i2c_driver);
-    h3lis331dl_setup(&high_g_acc, H3LIS331DL_CONFIG_ODR_400HZ | H3LIS331DL_CONFIG_FS_400G);
+    h3lis331dl_setup(&high_g_acc, H3LIS331DL_CONFIG_ODR_50HZ | H3LIS331DL_CONFIG_FS_100G);
     i2cReleaseBus(i2c_driver);
 
     // Magnetometer setup
