@@ -36,11 +36,6 @@ static THD_FUNCTION(sumd_input_task, arg)
             }
             chSysUnlock();
             chEvtBroadcastFlags(&rc_in_event, RC_INPUT_EVENT);
-            if (in.no_signal) {
-                status_led_off();
-            } else {
-                status_led_on();
-            }
         }
     }
     return 0;
