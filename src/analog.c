@@ -53,8 +53,8 @@ static THD_FUNCTION(adc_task, arg)
         adc_callback,           // callback fn
         adcerrorcallback,       // error callback fn
         0,                      // CR1
-        ADC_CR2_CONT,           // CR2
-        0,
+        ADC_CR2_CONT | ADC_CR2_SWSTART,           // CR2
+        0,                      // SMPR1
         ADC_SMPR2_SMP_AN0(5),   // SMPR2 : sample time 112 ADC cycles
         ADC_SQR1_NUM_CH(1),     // SQR1
         0,                      // SQR2
