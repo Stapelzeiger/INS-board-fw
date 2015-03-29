@@ -26,6 +26,18 @@ static void adc_callback(ADCDriver *adcp, adcsample_t *adc_samples, size_t n)
     adc_value = accumulator;
 }
 
+static void adcerrorcallback(ADCDriver *adcp, adcerror_t err)
+{
+    (void)adcp;
+    if (err == ADC_ERR_DMAFAILURE) {
+        chSysHalt("ADC_ERR_DMAFAILURE");
+    }
+    if (err == ADC_ERR_OVERFLOW) {
+        chSysHalt("ADC_ERR_OVERFLOW");
+    }
+    chSysHalt("ADC error");
+}
+
 static THD_FUNCTION(adc_task, arg)
 {
     (void)arg;
@@ -35,7 +47,7 @@ static THD_FUNCTION(adc_task, arg)
         TRUE,                   // circular
         ADC_NB_CHANNELS,        // nb channels
         adc_callback,           // callback fn
-        NULL,                   // error callback fn
+        adcerrorcallback,       // error callback fn
         0,                      // CR1
         ADC_CR2_CONT,           // CR2
         0,
