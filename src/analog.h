@@ -1,6 +1,8 @@
 #ifndef ANALOG_H
 #define ANALOG_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
