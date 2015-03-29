@@ -9,6 +9,7 @@
 #include "shell_cmds.h"
 #include "sumd_input.h"
 #include "sensors/onboardsensors.h"
+#include "analog.h"
 #include "serial-datagram/serial_datagram.h"
 #include "cmp/cmp.h"
 #include "cmp_mem_access/cmp_mem_access.h"
@@ -172,6 +173,7 @@ int main(void)
     sdcard_mount();
     file_cat(stdout, "/test.txt");
 
+    analog_init();
     onboard_sensors_start();
 
     sumd_input_start((BaseSequentialStream*)&UART_CONN2);
