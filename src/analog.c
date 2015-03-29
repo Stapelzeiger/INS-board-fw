@@ -10,7 +10,7 @@ static int32_t adc_value;
 
 int32_t analog_get(void)
 {
-    return adc_value / (DMA_BUFFER_SIZE / 2 / 4);
+    return adc_value / (DMA_BUFFER_SIZE / 2 / 16);
 }
 
 static void adc_callback(ADCDriver *adcp, adcsample_t *adc_samples, size_t n)
