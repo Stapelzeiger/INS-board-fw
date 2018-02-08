@@ -239,7 +239,11 @@ static void cmd_topic_print(BaseSequentialStream *stream, int argc, char *argv[]
     }
 }
 
-
+/* Called by __libc_fini_array() */
+void _fini(void)
+{
+    /* empty */
+}
 
 int main(void)
 {
