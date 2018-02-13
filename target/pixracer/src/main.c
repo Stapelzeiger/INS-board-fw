@@ -10,9 +10,9 @@ static THD_FUNCTION(heartbeat_main, arg)
     (void)arg;
     chRegSetThreadName("heartbeat");
     while (true) {
-        palClearPad(GPIOG, GPIOG_LED4_RED);
+        palClearPad(GPIOB, GPIOB_FMU_LED_GREEN);
         chThdSleepMilliseconds(500);
-        palSetPad(GPIOG, GPIOG_LED4_RED);
+        palSetPad(GPIOB, GPIOB_FMU_LED_GREEN);
         chThdSleepMilliseconds(500);
     }
 }
@@ -21,6 +21,10 @@ int main(void)
 {
     halInit();
     chSysInit();
+
+    chThdCreateStatic(heartbeat_thread, sizeof(heartbeat_thread),
+                      LOWPRIO, heartbeat_main, NULL);
+
 
     // // Shell manager initialization.
     // shellInit();
@@ -33,9 +37,6 @@ int main(void)
     chThdSleepMilliseconds(1000);
     usbStart(serusbcfg.usbp, &usbcfg);
     usbConnectBus(serusbcfg.usbp);
-
-    chThdCreateStatic(heartbeat_thread, sizeof(heartbeat_thread),
-                      LOWPRIO, heartbeat_main, NULL);
 
     while (true) {
         // if (SDU1.config->usbp->state == USB_ACTIVE) {
