@@ -36,9 +36,7 @@
 #define STM32_LSECLK                0U
 #endif
 
-#if !defined(STM32_HSECLK)
 #define STM32_HSECLK                24000000U
-#endif
 
 #define STM32_HSE_BYPASS
 
@@ -65,7 +63,7 @@
 #define GPIOA_MPU9250_MISO          6U
 #define GPIOA_MPU9250_MOSI          7U
 #define GPIOA_8266_RTS              8U // GPIOA_USB_SOF
-#define GPIOA_VBUS                  9U // GPIOA_USB_VBUS
+#define GPIOA_VBUS                  9U // GPIOA_USB_VBUS (input, floating)
 #define GPIOA_FrSky_INV             10U // GPIOA_USB_ID
 #define GPIOA_OTG_FS_DM             11U // GPIOA_USB_DM
 #define GPIOA_OTG_FS_DP             12U // GPIOA_USB_DP
@@ -73,7 +71,7 @@
 #define GPIOA_FMU_SWCLK             14U // GPIOA_JTAG_TCK
 #define GPIOA_ALARM                 15U // GPIOA_JTAG_TDI
 
-#define GPIOB_RC_INPUT              0U
+#define GPIOB_RC_INPUT              0U // GPIO_PPM_IN (AF2, pullup)
 #define GPIOB_FMU_LED_GREEN         1U
 #define GPIOB_BOOT1                 2U
 #define GPIOB_FMU_LED_BLUE          3U
@@ -90,12 +88,12 @@
 #define GPIOB_FRAM_MISO             14U
 #define GPIOB_FRAM_MOSI             15U
 
-#define GPIOC_VBUS_VALID            0U
+#define GPIOC_VBUS_VALID            0U // active high
 #define GPIOC_RSSI_IN               1U
 #define GPIOC_MPU9250_CS            2U
-#define GPIOC_LED_SAFETY            3U
-#define GPIOC_SAFETY_SWITCH_IN      4U
-#define GPIOC_VDD_3V3_PERIPH_EN     5U // active high
+#define GPIOC_LED_SAFETY            3U // active low
+#define GPIOC_SAFETY_SWITCH_IN      4U // GPIO_BTN_SAFETY (input pullup)
+#define GPIOC_VDD_3V3_PERIPH_EN     5U // GPIO_PERIPH_3V3_EN active high
 #define GPIOC_NC                    6U
 #define GPIOC_FMU_RC_INPUT          7U
 #define GPIOC_SDIO_D0               8U
@@ -104,7 +102,7 @@
 #define GPIOC_SDIO_D3               11U
 #define GPIOC_SDIO_CK               12U
 #define GPIOC_SBUS_INV              13U
-#define GPIOC_20608_DRDY            14U
+#define GPIOC_20608_DRDY            14U // GPIO_DRDY_ICM_20608_G active low (input, pullup, exti)
 #define GPIOC_20608_CS              15U
 
 #define GPIOD_CAN1_RX               0U
@@ -120,9 +118,9 @@
 #define GPIOD_FRAM_CS               10U
 #define GPIOD_FMU_USART3_CTS        11U
 #define GPIOD_FMU_USART3_RTS        12U
-#define GPIOD_FMU_CH5               13U
-#define GPIOD_FMU_CH6               14U
-#define GPIOD_MPU9250_DRDY          15U
+#define GPIOD_FMU_CH5               13U // PWM, GPIO_TIM4_CH2OUT (AF2, pushpull)
+#define GPIOD_FMU_CH6               14U // PWM, GPIO_TIM4_CH3OUT (AF2, pushpull)
+#define GPIOD_MPU9250_DRDY          15U // GPIO_DRDY_MPU9250 (input, floating, exti)
 
 #define GPIOE_FMU_USART8_RX         0U
 #define GPIOE_FMU_USART8_TX         1U
@@ -133,12 +131,12 @@
 #define GPIOE_8266_RST              6U
 #define GPIOE_FMU_UART7_RX          7U
 #define GPIOE_FMU_UART7_TX          8U
-#define GPIOE_FMU_CH4               9U
+#define GPIOE_FMU_CH4               9U // PWM, GPIO_TIM1_CH1OUT (AF1, pushpull)
 #define GPIOE_8266_CTS              10U
-#define GPIOE_FMU_CH3               11U
-#define GPIOE_HMC5983_DRDY          12U
-#define GPIOE_FMU_CH2               13U
-#define GPIOE_FMU_CH1               14U
+#define GPIOE_FMU_CH3               11U // PWM, GPIO_TIM1_CH2OUT (AF1, pushpull)
+#define GPIOE_HMC5983_DRDY          12U // GPIO_DRDY_HMC5983 (input, floating, exti)
+#define GPIOE_FMU_CH2               13U // PWM, GPIO_TIM1_CH3OUT (AF1, pushpull)
+#define GPIOE_FMU_CH1               14U // PWM, GPIO_TIM1_CH4OUT (AF1, pushpull)
 #define GPIOE_HMC5983_CS            15U
 
 #define GPIOH_OSC_IN                0U
@@ -147,12 +145,13 @@
 /*
  * IO lines assignments.
  */
-#define LINE_LED_SAFETY             PAL_LINE(GPIOC, 3U)
-
-
-#define LINE_OSC_IN                 PAL_LINE(GPIOH, 0U)
-#define LINE_OSC_OUT                PAL_LINE(GPIOH, 1U)
-
+#define LINE_LED_RED                PAL_LINE(GPIOB, GPIOB_FMU_LED_RED)
+#define LINE_LED1                   LINE_LED_RED
+#define LINE_LED_GREEN              PAL_LINE(GPIOB, GPIOB_FMU_LED_GREEN)
+#define LINE_LED2                   LINE_LED_GREEN
+#define LINE_LED_BLUE               PAL_LINE(GPIOB, GPIOB_FMU_LED_BLUE)
+#define LINE_LED3                   LINE_LED_BLUE
+#define LINE_LED_SAFETY             PAL_LINE(GPIOC, GPIOC_LED_SAFETY)
 
 /*
  * I/O ports initial setup, this configuration is established soon after reset
@@ -188,7 +187,7 @@
                                      PIN_MODE_INPUT(GPIOA_MPU9250_MISO) | \
                                      PIN_MODE_INPUT(GPIOA_MPU9250_MOSI) | \
                                      PIN_MODE_INPUT(GPIOA_8266_RTS) | \
-                                     PIN_MODE_ANALOG(GPIOA_VBUS) | \
+                                     PIN_MODE_INPUT(GPIOA_VBUS) | \
                                      PIN_MODE_INPUT(GPIOA_FrSky_INV) | \
                                      PIN_MODE_ALTERNATE(GPIOA_OTG_FS_DM) | \
                                      PIN_MODE_ALTERNATE(GPIOA_OTG_FS_DP) | \
@@ -296,9 +295,9 @@
                                      PIN_MODE_INPUT(GPIOB_FRAM_MISO) | \
                                      PIN_MODE_INPUT(GPIOB_FRAM_MOSI))
 #define VAL_GPIOB_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOB_RC_INPUT) | \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_FMU_LED_GREEN) | \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_FMU_LED_GREEN) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_BOOT1) | \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_FMU_LED_BLUE) | \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_FMU_LED_BLUE) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_8266_GPIO2) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_VDD_BRICK_VALID) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_FMU_USART1_TX) | \
@@ -306,7 +305,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_FMU_I2C1_SCL) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_FMU_I2C1_SDA) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_FRAM_SCK) | \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_FMU_LED_RED) | \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_FMU_LED_RED) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_CAN2_RX) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_CAN2_TX) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_FRAM_MISO) | \
@@ -431,7 +430,7 @@
                                      PIN_PUPDR_PULLDOWN(GPIOC_RSSI_IN) | \
                                      PIN_PUPDR_PULLDOWN(GPIOC_MPU9250_CS) | \
                                      PIN_PUPDR_FLOATING(GPIOC_LED_SAFETY) | \
-                                     PIN_PUPDR_PULLDOWN(GPIOC_SAFETY_SWITCH_IN) | \
+                                     PIN_PUPDR_PULLUP(GPIOC_SAFETY_SWITCH_IN) | \
                                      PIN_PUPDR_FLOATING(GPIOC_VDD_3V3_PERIPH_EN) | \
                                      PIN_PUPDR_PULLDOWN(GPIOC_NC) | \
                                      PIN_PUPDR_PULLDOWN(GPIOC_FMU_RC_INPUT) | \
@@ -441,7 +440,7 @@
                                      PIN_PUPDR_PULLDOWN(GPIOC_SDIO_D3) | \
                                      PIN_PUPDR_PULLDOWN(GPIOC_SDIO_CK) | \
                                      PIN_PUPDR_PULLDOWN(GPIOC_SBUS_INV) | \
-                                     PIN_PUPDR_PULLDOWN(GPIOC_20608_DRDY) | \
+                                     PIN_PUPDR_PULLUP(GPIOC_20608_DRDY) | \
                                      PIN_PUPDR_PULLDOWN(GPIOC_20608_CS))
 #define VAL_GPIOC_ODR               (PIN_ODR_LOW(GPIOC_VBUS_VALID) | \
                                      PIN_ODR_LOW(GPIOC_RSSI_IN) | \
@@ -639,7 +638,7 @@
                                      PIN_PUPDR_PULLDOWN(GPIOE_FMU_CH4) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_8266_CTS) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_FMU_CH3) | \
-                                     PIN_PUPDR_PULLDOWN(GPIOE_HMC5983_DRDY) | \
+                                     PIN_PUPDR_FLOATING(GPIOE_HMC5983_DRDY) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_FMU_CH2) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_FMU_CH1) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_HMC5983_CS))
