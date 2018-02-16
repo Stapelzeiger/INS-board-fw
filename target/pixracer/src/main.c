@@ -91,6 +91,8 @@ void shell_spawn(BaseSequentialStream *stream)
     }
 }
 
+#define TELEM1 (BaseSequentialStream *)&SD2
+
 int main(void)
 {
     halInit();
@@ -108,6 +110,9 @@ int main(void)
     sdStart(&SD7, &uart_config);
     chprintf((BaseSequentialStream *)&SD7, "\nboot\n");
 
+    // Telemetry 1 serial port
+    sdStart(&SD2, &uart_config);
+
     // Shell manager initialization.
     shellInit();
 
@@ -121,6 +126,7 @@ int main(void)
     usbConnectBus(serusbcfg.usbp);
 
     while (true) {
+        chprintf(TELEM1, "hello world\n");
         chprintf((BaseSequentialStream *)&SD7, "hello world\n");
         shell_spawn((BaseSequentialStream *)&SDU1);
         chThdSleepMilliseconds(1000);

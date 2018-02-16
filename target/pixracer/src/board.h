@@ -481,8 +481,8 @@
                                      PIN_MODE_INPUT(GPIOD_SDIO_CMD) | \
                                      PIN_MODE_INPUT(GPIOD_FMU_USART2_CTS) | \
                                      PIN_MODE_INPUT(GPIOD_FMU_USART2_RTS) | \
-                                     PIN_MODE_INPUT(GPIOD_FMU_USART2_TX) | \
-                                     PIN_MODE_INPUT(GPIOD_FMU_USART2_RX) | \
+                                     PIN_MODE_ALTERNATE(GPIOD_FMU_USART2_TX) | \
+                                     PIN_MODE_ALTERNATE(GPIOD_FMU_USART2_RX) | \
                                      PIN_MODE_INPUT(GPIOD_BARO_CS) | \
                                      PIN_MODE_INPUT(GPIOD_FMU_USART3_TX) | \
                                      PIN_MODE_INPUT(GPIOD_FMU_USART3_RX) | \
@@ -561,8 +561,8 @@
                                      PIN_AFIO_AF(GPIOD_SDIO_CMD, 0U) | \
                                      PIN_AFIO_AF(GPIOD_FMU_USART2_CTS, 0U) | \
                                      PIN_AFIO_AF(GPIOD_FMU_USART2_RTS, 0U) | \
-                                     PIN_AFIO_AF(GPIOD_FMU_USART2_TX, 0U) | \
-                                     PIN_AFIO_AF(GPIOD_FMU_USART2_RX, 0U) | \
+                                     PIN_AFIO_AF(GPIOD_FMU_USART2_TX, 7U) | \
+                                     PIN_AFIO_AF(GPIOD_FMU_USART2_RX, 7U) | \
                                      PIN_AFIO_AF(GPIOD_BARO_CS, 0U))
 #define VAL_GPIOD_AFRH              (PIN_AFIO_AF(GPIOD_FMU_USART3_TX, 0U) | \
                                      PIN_AFIO_AF(GPIOD_FMU_USART3_RX, 0U) | \
