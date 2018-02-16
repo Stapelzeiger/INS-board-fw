@@ -4,6 +4,9 @@
 #include <shell.h>
 #include "usbcfg.h"
 
+#define HEARTBEAT_THD_PRIO  (LOWPRIO)
+#define SHELL_THD_PRIO      (LOWPRIO + 1)
+
 static THD_WORKING_AREA(heartbeat_thread, 128);
 static THD_FUNCTION(heartbeat_main, arg)
 {
@@ -17,17 +20,41 @@ static THD_FUNCTION(heartbeat_main, arg)
     }
 }
 
+const ShellCommand commands[] = {
+    {NULL, NULL}
+};
+
+void shell_spawn(BaseSequentialStream *stream)
+{
+    static THD_WORKING_AREA(shell_wa, 2048);
+    static thread_t *shelltp = NULL;
+    static ShellConfig shell_cfg = {
+        NULL,
+        commands
+    };
+
+    if (!shelltp) {
+        shell_cfg.sc_channel = stream;
+        shelltp = chThdCreateStatic(&shell_wa, sizeof(shell_wa), SHELL_THD_PRIO,
+                                    shellThread, (void *)&shell_cfg);
+        chRegSetThreadNameX(shelltp, "shell");
+    } else if (chThdTerminatedX(shelltp)) {
+        chThdRelease(shelltp);    /* Recovers memory of the previous shell.   */
+        shelltp = NULL;           /* Triggers spawning of a new shell.        */
+    }
+}
+
 int main(void)
 {
     halInit();
     chSysInit();
 
     chThdCreateStatic(heartbeat_thread, sizeof(heartbeat_thread),
-                      LOWPRIO, heartbeat_main, NULL);
+                      HEARTBEAT_THD_PRIO, heartbeat_main, NULL);
 
 
-    // // Shell manager initialization.
-    // shellInit();
+    // Shell manager initialization.
+    shellInit();
 
     // Initializes a serial-over-USB CDC driver.
     sduObjectInit(&SDU1);
@@ -39,13 +66,7 @@ int main(void)
     usbConnectBus(serusbcfg.usbp);
 
     while (true) {
-        // if (SDU1.config->usbp->state == USB_ACTIVE) {
-        //     thread_t *shelltp = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
-        //                                             "shell", NORMALPRIO + 1,
-        //                                             shellThread, (void *)&shell_cfg1);
-        //     chThdWait(shelltp);
-        // }
-        chprintf((BaseSequentialStream *)&SDU1, "hello world\n");
+        shell_spawn((BaseSequentialStream *)&SDU1);
         chThdSleepMilliseconds(1000);
     }
 }
