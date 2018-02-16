@@ -2,6 +2,7 @@
 #include <hal.h>
 #include <chprintf.h>
 #include <shell.h>
+#include <shell_cmd.h>
 #include "usbcfg.h"
 
 #define HEARTBEAT_THD_PRIO  (LOWPRIO)
@@ -20,19 +21,65 @@ static THD_FUNCTION(heartbeat_main, arg)
     }
 }
 
+static void cmd_threads(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    static const char *states[] = {CH_STATE_NAMES};
+    thread_t *tp;
+
+    (void)argv;
+    if (argc > 0) {
+        shellUsage(chp, "threads");
+        return;
+    }
+    chprintf(chp,
+             "stklimit    stack     addr refs prio     state       time         name\r\n"SHELL_NEWLINE_STR);
+    tp = chRegFirstThread();
+    do {
+#if (CH_DBG_ENABLE_STACK_CHECK == TRUE) || (CH_CFG_USE_DYNAMIC == TRUE)
+        uint32_t stklimit = (uint32_t)tp->wabase;
+#else
+        uint32_t stklimit = 0U;
+#endif
+        chprintf(chp, "%08lx %08lx %08lx %4lu %4lu %9s %10lu %12s"SHELL_NEWLINE_STR,
+                 stklimit, (uint32_t)tp->ctx.sp, (uint32_t)tp,
+                 (uint32_t)tp->refs - 1, (uint32_t)tp->prio, states[tp->state],
+                 (uint32_t)tp->time, tp->name == NULL ? "" : tp->name);
+        tp = chRegNextThread(tp);
+    } while (tp != NULL);
+    chprintf(chp, "[sytick %d @ %d Hz]\n", chVTGetSystemTime(), CH_CFG_ST_FREQUENCY);
+}
+
 const ShellCommand commands[] = {
+    {"threads", cmd_threads},
     {NULL, NULL}
+};
+
+static THD_WORKING_AREA(shell_wa, 2048);
+static thread_t *shelltp = NULL;
+
+#if (SHELL_USE_HISTORY == TRUE)
+char sc_histbuf[256];
+#endif
+#if (SHELL_USE_COMPLETION == TRUE)
+// size = # help + # default commands + # custom commands + 1 for NULL termination
+#define SC_COMPLETION_SIZE (sizeof(commands) / sizeof(ShellCommand) + 8)
+char *sc_completion[SC_COMPLETION_SIZE];
+#endif
+
+static ShellConfig shell_cfg = {
+    NULL,
+    commands,
+#if (SHELL_USE_HISTORY == TRUE)
+    sc_histbuf,
+    sizeof(sc_histbuf),
+#endif
+#if (SHELL_USE_COMPLETION == TRUE)
+    sc_completion
+#endif
 };
 
 void shell_spawn(BaseSequentialStream *stream)
 {
-    static THD_WORKING_AREA(shell_wa, 2048);
-    static thread_t *shelltp = NULL;
-    static ShellConfig shell_cfg = {
-        NULL,
-        commands
-    };
-
     if (!shelltp) {
         shell_cfg.sc_channel = stream;
         shelltp = chThdCreateStatic(&shell_wa, sizeof(shell_wa), SHELL_THD_PRIO,

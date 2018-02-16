@@ -515,7 +515,7 @@
 /* Port-specific settings (override port settings defaulted in chcore.h).    */
 /*===========================================================================*/
 
-#define SHELL_CMD_TEST_ENABLED  FALSE
+#define SHELL_CONFIG_FILE
 
 #endif  /* CHCONF_H */
 
