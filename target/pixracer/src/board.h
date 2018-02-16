@@ -38,8 +38,6 @@
 
 #define STM32_HSECLK                24000000U
 
-#define STM32_HSE_BYPASS
-
 /*
  * Board voltages.
  * Required for performance limits calculation.
