@@ -129,8 +129,8 @@
 #define GPIOE_SPEKTRUM_POWER        4U // active low
 #define GPIOE_8266_PD               5U
 #define GPIOE_8266_RST              6U
-#define GPIOE_FMU_UART7_RX          7U
-#define GPIOE_FMU_UART7_TX          8U
+#define GPIOE_FMU_UART7_RX          7U // DEBUG_UART_RX (AF8)
+#define GPIOE_FMU_UART7_TX          8U // DEBUG_UART_TX (AF8)
 #define GPIOE_FMU_CH4               9U // PWM, GPIO_TIM1_CH1OUT (AF1, pushpull)
 #define GPIOE_8266_CTS              10U
 #define GPIOE_FMU_CH3               11U // PWM, GPIO_TIM1_CH2OUT (AF1, pushpull)
@@ -585,8 +585,8 @@
                                      PIN_MODE_OUTPUT(GPIOE_SPEKTRUM_POWER) | \
                                      PIN_MODE_INPUT(GPIOE_8266_PD) | \
                                      PIN_MODE_INPUT(GPIOE_8266_RST) | \
-                                     PIN_MODE_INPUT(GPIOE_FMU_UART7_RX) | \
-                                     PIN_MODE_INPUT(GPIOE_FMU_UART7_TX) | \
+                                     PIN_MODE_ALTERNATE(GPIOE_FMU_UART7_RX) | \
+                                     PIN_MODE_ALTERNATE(GPIOE_FMU_UART7_TX) | \
                                      PIN_MODE_INPUT(GPIOE_FMU_CH4) | \
                                      PIN_MODE_INPUT(GPIOE_8266_CTS) | \
                                      PIN_MODE_INPUT(GPIOE_FMU_CH3) | \
@@ -633,8 +633,8 @@
                                      PIN_PUPDR_FLOATING(GPIOE_SPEKTRUM_POWER) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_8266_PD) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_8266_RST) | \
-                                     PIN_PUPDR_PULLDOWN(GPIOE_FMU_UART7_RX) | \
-                                     PIN_PUPDR_PULLDOWN(GPIOE_FMU_UART7_TX) | \
+                                     PIN_PUPDR_PULLUP(GPIOE_FMU_UART7_RX) | \
+                                     PIN_PUPDR_FLOATING(GPIOE_FMU_UART7_TX) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_FMU_CH4) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_8266_CTS) | \
                                      PIN_PUPDR_PULLDOWN(GPIOE_FMU_CH3) | \
@@ -665,8 +665,8 @@
                                      PIN_AFIO_AF(GPIOE_SPEKTRUM_POWER, 0U) | \
                                      PIN_AFIO_AF(GPIOE_8266_PD, 0U) | \
                                      PIN_AFIO_AF(GPIOE_8266_RST, 0U) | \
-                                     PIN_AFIO_AF(GPIOE_FMU_UART7_RX, 0U))
-#define VAL_GPIOE_AFRH              (PIN_AFIO_AF(GPIOE_FMU_UART7_TX, 0U) | \
+                                     PIN_AFIO_AF(GPIOE_FMU_UART7_RX, 8U))
+#define VAL_GPIOE_AFRH              (PIN_AFIO_AF(GPIOE_FMU_UART7_TX, 8U) | \
                                      PIN_AFIO_AF(GPIOE_FMU_CH4, 0U) | \
                                      PIN_AFIO_AF(GPIOE_8266_CTS, 0U) | \
                                      PIN_AFIO_AF(GPIOE_FMU_CH3, 0U) | \

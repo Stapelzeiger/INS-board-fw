@@ -100,6 +100,14 @@ int main(void)
                       HEARTBEAT_THD_PRIO, heartbeat_main, NULL);
 
 
+    SerialConfig uart_config = {
+        SERIAL_DEFAULT_BITRATE, 0,
+        USART_CR2_STOP1_BITS, 0
+    };
+    uart_config.speed = 57600;
+    sdStart(&SD7, &uart_config);
+    chprintf((BaseSequentialStream *)&SD7, "\nboot\n");
+
     // Shell manager initialization.
     shellInit();
 
@@ -113,6 +121,7 @@ int main(void)
     usbConnectBus(serusbcfg.usbp);
 
     while (true) {
+        chprintf((BaseSequentialStream *)&SD7, "hello world\n");
         shell_spawn((BaseSequentialStream *)&SDU1);
         chThdSleepMilliseconds(1000);
     }
