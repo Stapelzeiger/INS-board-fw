@@ -5,7 +5,7 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
+  USE_OPT = -Os -ggdb -fomit-frame-pointer -falign-functions=16
 endif
 
 # C specific options here (added to USE_OPT).
@@ -85,6 +85,9 @@ endif
 # Define project name here
 PROJECT = ch
 
+PROJROOT = ../..
+TARGETROOT = .
+
 # Imported source files and paths
 CHIBIOS = ../../lib/mcu/ChibiOS
 # Startup files.
@@ -92,7 +95,6 @@ include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f4xx.m
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/ports/STM32/STM32F4xx/platform.mk
-include $(CHIBIOS)/os/hal/boards/ST_STM32F429I_DISCOVERY/board.mk
 include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
@@ -101,6 +103,14 @@ include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 #include $(CHIBIOS)/test/rt/test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 include $(CHIBIOS)/os/various/shell/shell.mk
+
+include $(CHIBIOS)/os/various/cpp_wrappers/chcpp.mk
+include $(PROJROOT)/lib/fatfs/fatfs.mk
+include $(PROJROOT)/src/src.mk
+include $(PROJROOT)/lib/src.mk
+include $(TARGETROOT)/src/src.mk
+
+include $(PROJROOT)/types/types.mk
 
 # Define linker script file here
 LDSCRIPT= linker/STM32F427xI.ld
@@ -116,11 +126,12 @@ CSRC = $(STARTUPSRC) \
        $(TESTSRC) \
        $(STREAMSSRC) \
        $(SHELLSRC) \
-       src/usbcfg.c src/board.c src/main.c
+       $(FATFSSRC) \
+       $(PROJCSRC)
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CPPSRC =
+CPPSRC = $(PROJCPPSRC)
 
 # C sources to be compiled in ARM mode regardless of the global setting.
 # NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
@@ -143,14 +154,14 @@ TCSRC =
 TCPPSRC =
 
 # List ASM source files here
-ASMSRC =
+ASMSRC = $(PROJASMSRC)
 ASMXSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
 INCDIR = $(CHIBIOS)/os/license \
          $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
          $(HALINC) $(PLATFORMINC) $(TESTINC) \
          $(STREAMSINC) $(SHELLINC) \
-         src/
+         $(FATFSINC) $(PROJINC)
 
 #
 # Project, sources and paths
@@ -220,3 +231,15 @@ ULIBS =
 
 RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC
 include $(RULESPATH)/rules.mk
+
+PRE_MAKE_ALL_RULE_HOOK: $(notdir $(TYPECSRC))
+	cd $(PROJROOT)/src/flight-stack && ./code_gen.sh
+	cd $(PROJROOT) && ./git_revision.sh
+
+POST_MAKE_ALL_RULE_HOOK:
+
+# Generates a ctags file containing the correct definition for the build
+.PHONY: ctags
+ctags:
+	@echo "Generating ctags file..."
+	@cat .dep/*.d | grep ":$$" | sed "s/://" | sort | uniq | xargs ctags --file-scope=no --extra=+q $(CSRC) $(CPPSRC)

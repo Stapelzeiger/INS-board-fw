@@ -4,9 +4,18 @@
 #include <shell.h>
 #include <shell_cmd.h>
 #include "usbcfg.h"
+#include "thread_prio.h"
 
-#define HEARTBEAT_THD_PRIO  (LOWPRIO)
-#define SHELL_THD_PRIO      (LOWPRIO + 1)
+#include <parameter/parameter.h>
+#include <msgbus/msgbus.h>
+
+BaseSequentialStream* stdout;
+
+parameter_namespace_t parameters;
+parameter_t board_name;
+char board_name_p_buf[32];
+
+msgbus_t bus;
 
 static THD_WORKING_AREA(heartbeat_thread, 128);
 static THD_FUNCTION(heartbeat_main, arg)
@@ -82,7 +91,7 @@ void shell_spawn(BaseSequentialStream *stream)
 {
     if (!shelltp) {
         shell_cfg.sc_channel = stream;
-        shelltp = chThdCreateStatic(&shell_wa, sizeof(shell_wa), SHELL_THD_PRIO,
+        shelltp = chThdCreateStatic(&shell_wa, sizeof(shell_wa), THD_PRIO_SHELL,
                                     shellThread, (void *)&shell_cfg);
         chRegSetThreadNameX(shelltp, "shell");
     } else if (chThdTerminatedX(shelltp)) {
@@ -99,7 +108,7 @@ int main(void)
     chSysInit();
 
     chThdCreateStatic(heartbeat_thread, sizeof(heartbeat_thread),
-                      HEARTBEAT_THD_PRIO, heartbeat_main, NULL);
+                      THD_PRIO_LED, heartbeat_main, NULL);
 
 
     SerialConfig uart_config = {

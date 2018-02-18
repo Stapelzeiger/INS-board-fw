@@ -8,11 +8,10 @@ PROJCPPSRC += $(PROJROOT)/src/flight-stack/src/attitude_estimation/ekf_gyro_acc.
 PROJCPPSRC += $(PROJROOT)/src/flight-stack/src/attitude_estimation/ekf_gyro_acc_mag.cpp
 
 PROJCSRC += $(PROJROOT)/src/error.c
-PROJCPPSRC += $(PROJROOT)/src/attitude_determination.cpp
+# PROJCPPSRC += $(PROJROOT)/src/attitude_determination.cpp
 PROJCSRC += $(PROJROOT)/src/datagram_message_comm.c
 PROJCSRC += $(PROJROOT)/src/log.c
-PROJCSRC += $(PROJROOT)/src/onboardsensors.c
-PROJCSRC += $(PROJROOT)/src/sdcard.c
+#PROJCSRC += $(PROJROOT)/src/sdcard.c
 PROJCSRC += $(PROJROOT)/src/sdlog.c
 PROJCSRC += $(PROJROOT)/src/sqrtpatch.c
 PROJCSRC += $(PROJROOT)/src/stream.c

@@ -54,10 +54,11 @@ static bool panic_buffer_crc_matched;
 void panic_handler(const char *reason)
 {
     (void)reason;
-    palSetPad(GPIOA, GPIOA_LED_ERROR);
-    palClearPad(GPIOB, GPIOB_LED_STATUS);
-    palClearPad(GPIOA, GPIOA_LED_HEARTBEAT);
-    palClearPad(GPIOB, GPIOB_LED_SDCARD);
+    // XXX TODO
+    // palSetPad(GPIOA, GPIOA_LED_ERROR);
+    // palClearPad(GPIOB, GPIOB_LED_STATUS);
+    // palClearPad(GPIOA, GPIOA_LED_HEARTBEAT);
+    // palClearPad(GPIOB, GPIOB_LED_SDCARD);
 
     static volatile uint32_t ipsr;
     static volatile const char *msg;
